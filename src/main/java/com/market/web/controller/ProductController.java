@@ -2,10 +2,7 @@ package com.market.web.controller;
 
 import com.market.domain.Product;
 import com.market.domain.service.ProductService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +19,15 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/all")
-    @ApiOperation("Get all supermarket products")
+    @ApiOperation(value = "Get all supermarket products", authorizations = { @Authorization(value="JWT") })
     @ApiResponse(code = 200, message = "OK")
     public ResponseEntity<List<Product>> getAll(){
         return new ResponseEntity<>(productService.getAll(), HttpStatus.OK);
     }
 
+
     @GetMapping("/{id}")
-    @ApiOperation("Search a product with an ID")
+    @ApiOperation(value = "Search a product with an ID", authorizations = { @Authorization(value="JWT") })
     @ApiResponses({
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 404, message = "Product not found")
@@ -42,11 +40,17 @@ public class ProductController {
     }
 
     @GetMapping("/category/{categoryId}")
+    @ApiOperation(value = "Get products by category", authorizations = { @Authorization(value="JWT") })
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 404, message = "Category not found")
+    })
     public ResponseEntity<List<Product>> getByCategory(@PathVariable("categoryId") int categoryId){
         return productService.getByCategory(categoryId)
                 .map(product -> new ResponseEntity<>(product, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
 
     @PostMapping("save")
     public ResponseEntity<Product> save(@RequestBody Product product){
